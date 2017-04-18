@@ -122,7 +122,7 @@ class CSS extends MinifyComponent
             }
         }
 
-        $file = $this->prepareResultFile($resultFile);
+        $file = $this->prepareResultFile($resultFile , "CSS" );
 
         $this->view->cssFiles[$file] = Html::cssFile($file);
     }
