@@ -1,6 +1,6 @@
 {
-  "name": "rmrevin/yii2-minify-view",
-  "description": "Yii2 View component with minification css & js",
+  "name": "processfast/yii2-minify-view",
+  "description": "Modification of rmrevin/yii-2-minify-view lib to allow minification of css & js in a load balanced environment",
   "keywords": [
     "yii2",
     "minify",
@@ -12,15 +12,15 @@
   "license": "MIT",
   "minimum-stability": "stable",
   "support": {
-    "issues": "https://github.com/rmrevin/yii2-minify-view/issues?state=open",
-    "wiki": "https://github.com/rmrevin/yii2-minify-view/wiki",
-    "source": "https://github.com/rmrevin/yii2-minify-view"
+    "issues": "https://github.com/ProcessFast/yii2-minify-view/issues?state=open",
+    "wiki": "https://github.com/ProcessFast/yii2-minify-view/wiki",
+    "source": "https://github.com/ProcessFast/yii2-minify-view"
   },
   "authors": [
     {
-      "name": "Revin Roman",
-      "email": "roman@rmrevin.com",
-      "homepage": "https://rmrevin.com/"
+      "name": "ProcessFast, LLC and Roman Revin",
+      "email": "support@processfast.com",
+      "homepage": "https://processfast.com"
     }
   ],
   "require": {
@@ -29,7 +29,7 @@
   },
   "autoload": {
     "psr-4": {
-      "rmrevin\\yii\\minify\\": ""
+      "processfast\\yii\\minify\\": ""
     }
   }
 }
