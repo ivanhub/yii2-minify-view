@@ -2,6 +2,8 @@
   "name": "processfast/yii2-minify-view",
   "description": "Modification of rmrevin/yii-2-minify-view lib to allow minification of css & js in a load balanced environment",
   "keywords": [
+    "AWS",
+    "S3",
     "yii2",
     "minify",
     "view",
