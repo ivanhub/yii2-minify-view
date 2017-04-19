@@ -213,6 +213,9 @@ class View extends \yii\web\View
     {
         parent::init();
 
+        // 5 minutes  if there are lots of files
+        ini_set('max_execution_time', '300');
+
         $this->webPath = empty($this->webPath) ? $this->web_path : $this->webPath;
         $this->basePath = empty($this->basePath) ? $this->base_path : $this->basePath;
         $this->minifyPath = empty($this->minifyPath) ? $this->minify_path : $this->minifyPath;
