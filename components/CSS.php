@@ -2,16 +2,16 @@
 /**
  * CSS.php
  * @author Revin Roman
- * @link https://rmrevin.com
+ * @link https://processfast.com
  */
 
-namespace rmrevin\yii\minify\components;
+namespace processfast\yii\minify\components;
 
 use yii\helpers\Html;
 
 /**
  * Class CSS
- * @package rmrevin\yii\minify\components
+ * @package processfast\yii\minify\components
  */
 class CSS extends MinifyComponent
 {
@@ -63,6 +63,15 @@ class CSS extends MinifyComponent
 
             foreach ($files as $file => $html) {
                 $path = dirname($file);
+
+                if( $this->view->S3Upload )
+                {
+                    $assetsFolderPathPatch = $this->view->assetsFolderPathPatch ;
+                    $pathArray = explode('assets', $path, 2);
+                    $newPath = $pathArray[1] ;
+                    $path = $assetsFolderPathPatch."assets".$newPath ;
+                }
+
                 $file = $this->getAbsoluteFilePath($file);
 
                 $content = '';
@@ -120,9 +129,20 @@ class CSS extends MinifyComponent
             if (false !== $this->view->fileMode) {
                 @chmod($resultFile, $this->view->fileMode);
             }
+
+            if( $this->view->S3Upload )
+            {
+                $resultFile = $this->uploadToS3( $resultFile , "CSS" );
+            }
+
+        }
+        else if( $this->view->S3Upload )
+        {
+            $resultFile = $this->getS3Path( $resultFile , "CSS" );
         }
 
-        $file = $this->prepareResultFile($resultFile , "CSS" );
+
+        $file = $this->prepareResultFile($resultFile);
 
         $this->view->cssFiles[$file] = Html::cssFile($file);
     }

@@ -2,25 +2,25 @@
 /**
  * ViewTest.php
  * @author Revin Roman
- * @link https://rmrevin.ru
+ * @link https://processfast.ru
  */
 
-namespace rmrevin\yii\minify\tests\unit\view;
+namespace processfast\yii\minify\tests\unit\view;
 
-use rmrevin\yii\minify;
+use processfast\yii\minify;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 
 /**
  * Class ViewTest
- * @package rmrevin\yii\minify\tests\unit\view
+ * @package processfast\yii\minify\tests\unit\view
  */
 class ViewTest extends minify\tests\unit\TestCase
 {
 
     public function testMain()
     {
-        $this->assertInstanceOf('rmrevin\yii\minify\View', $this->getView());
+        $this->assertInstanceOf('processfast\yii\minify\View', $this->getView());
 
         $this->assertEquals('CP1251', $this->getView()->force_charset);
     }

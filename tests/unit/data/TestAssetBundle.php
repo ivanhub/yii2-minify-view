@@ -2,14 +2,14 @@
 /**
  * TestAssetBundle.php
  * @author Revin Roman
- * @link https://rmrevin.ru
+ * @link https://processfast.ru
  */
 
-namespace rmrevin\yii\minify\tests\unit\data;
+namespace processfast\yii\minify\tests\unit\data;
 
 /**
  * Class TestAssetBundle
- * @package rmrevin\yii\minify\tests\unit\data
+ * @package processfast\yii\minify\tests\unit\data
  */
 class TestAssetBundle extends \yii\web\AssetBundle
 {
@@ -23,11 +23,11 @@ class TestAssetBundle extends \yii\web\AssetBundle
     ];
 
     public $jsOptions = [
-        'position' => \rmrevin\yii\minify\View::POS_READY,
+        'position' => \processfast\yii\minify\View::POS_READY,
     ];
 
     public $depends = [
-        'rmrevin\yii\minify\tests\unit\data\DependAssetBundle',
+        'processfast\yii\minify\tests\unit\data\DependAssetBundle',
     ];
 
     public function init()

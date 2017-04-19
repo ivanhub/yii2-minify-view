@@ -2,16 +2,16 @@
 /**
  * JS.php
  * @author Revin Roman
- * @link https://rmrevin.com
+ * @link https://processfast.com
  */
 
-namespace rmrevin\yii\minify\components;
+namespace processfast\yii\minify\components;
 
 use yii\helpers\Html;
 
 /**
  * Class JS
- * @package rmrevin\yii\minify\components
+ * @package processfast\yii\minify\components
  */
 class JS extends MinifyComponent
 {
@@ -104,9 +104,18 @@ class JS extends MinifyComponent
             if (false !== $this->view->fileMode) {
                 @chmod($resultFile, $this->view->fileMode);
             }
+
+            if( $this->view->S3Upload )
+            {
+                $resultFile = $this->uploadToS3( $resultFile , "JS" );
+            }
+        }
+        else if( $this->view->S3Upload )
+        {
+            $resultFile = $this->getS3Path( $resultFile , "JS" );
         }
 
-        $file = $this->prepareResultFile($resultFile , "JS" );
+        $file = $this->prepareResultFile($resultFile);
 
         $this->view->jsFiles[$position][$file] = Html::jsFile($file, $options);
     }

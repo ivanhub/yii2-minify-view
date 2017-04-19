@@ -2,14 +2,14 @@
 /**
  * HtmlCompressor.php
  * @author Revin Roman
- * @link https://rmrevin.ru
+ * @link https://processfast.ru
  */
 
-namespace rmrevin\yii\minify;
+namespace processfast\yii\minify;
 
 /**
  * Class HtmlCompressor
- * @package rmrevin\yii\minify
+ * @package processfast\yii\minify
  */
 class HtmlCompressor
 {

@@ -2,14 +2,14 @@
 /**
  * EmptyAssetBundle.php
  * @author Revin Roman
- * @link https://rmrevin.com
+ * @link https://processfast.com
  */
 
-namespace rmrevin\yii\minify\tests\unit\data;
+namespace processfast\yii\minify\tests\unit\data;
 
 /**
  * Class EmptyAssetBundle
- * @package rmrevin\yii\minify\tests\unit\data
+ * @package processfast\yii\minify\tests\unit\data
  */
 class EmptyAssetBundle extends \yii\web\AssetBundle
 {

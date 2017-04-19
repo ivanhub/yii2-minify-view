@@ -2,19 +2,17 @@
 /**
  * Minify.php
  * @author Revin Roman
- * @link https://rmrevin.com
+ * @link https://processfast.com
  */
 
-namespace rmrevin\yii\minify\components;
+namespace processfast\yii\minify\components;
 
-use rmrevin\yii\minify\View;
-use common\components\AppBasic;
-use common\components\CriteriaVisualizationsHelper;
+use processfast\yii\minify\View;
 
 
 /**
  * Class MinifyComponent
- * @package rmrevin\yii\minify\components
+ * @package processfast\yii\minify\components
  */
 abstract class MinifyComponent
 {
@@ -121,62 +119,22 @@ abstract class MinifyComponent
      * @param string $resultFile
      * @return string
      */
-    protected function prepareResultFile($resultFile , $type = "")
+    protected function prepareResultFile($resultFile)
     {
-        $file = sprintf('%s%s', \Yii::getAlias($this->view->webPath), str_replace(\Yii::getAlias($this->view->basePath), '', $resultFile));
+        if( !$this->view->S3Upload )
+        {
+            $file = sprintf('%s%s', \Yii::getAlias($this->view->webPath), str_replace(\Yii::getAlias($this->view->basePath), '', $resultFile));
+        }
+        else
+        {
+            $file = $resultFile ;
+        }
 
         $AssetManager = $this->view->getAssetManager();
 
         if ($AssetManager->appendTimestamp && ($timestamp = @filemtime($resultFile)) > 0) {
             $file .= "?v=$timestamp";
         }
-
-
-        // This is added code which uploads to S3
-        if( AppBasic::stringNotNull($type) )
-        {
-            $versionName = CriteriaVisualizationsHelper::getVersionName() ;
-        }
-
-        $env = "" ;
-        if( YII_ENV == 'dev' )
-        {
-            $env = "dev" ;
-        }
-        else if( YII_ENV == 'qa'  )
-        {
-            $env = "qa" ;
-        }
-        else if( YII_ENV == 'prod'  )
-        {
-            $env = "prod" ;
-        }
-
-        $mime_type = null ;
-        $fileName =  null ;
-        if( $type == "CSS" )
-        {
-            $prefix = "" ;
-            $layout = \Yii::$app->controller->layout ;
-            if( in_array( $layout , ["old_main","public_pages"] ) )
-            {
-                $prefix = "public-pages-" ;
-            }
-
-            $mime_type = "text/css" ;
-            $fileName = "web-assets/".$env."/minify/.$prefix.all-in-one.$versionName.css";
-        }
-        else if( $type == "JS" )
-        {
-            $mime_type = "application/javascript" ;
-            $fileName = "web-assets/".$env."/minify/all-in-one.$versionName.js";
-        }
-
-        if( AppBasic::stringNotNull($type) )
-        {
-            $file = CriteriaVisualizationsHelper::handleAssetUpload( $resultFile , $mime_type , $fileName );
-        }
-
 
         return $file;
     }
@@ -206,4 +164,144 @@ abstract class MinifyComponent
 
         return sha1($result);
     }
+
+    protected function uploadToS3( $resultFile , $type )
+    {
+        $versionName = self::getVersionName() ;
+
+        $env = "" ;
+        if( YII_ENV == 'dev' )
+        {
+            $env = "dev" ;
+        }
+        else if( YII_ENV == 'qa'  )
+        {
+            $env = "qa" ;
+        }
+        else if( YII_ENV == 'prod'  )
+        {
+            $env = "prod" ;
+        }
+
+        $mime_type = null ;
+        $fileName =  null ;
+        if( $type == "CSS" )
+        {
+            $prefix = "" ;
+            $layout = \Yii::$app->controller->layout ;
+            if( in_array( $layout , ["old_main","public_pages"] ) )
+            {
+                $prefix = "public-pages-" ;
+            }
+
+            $mime_type = "text/css" ;
+            $fileName = "web-assets/".$env."/minify/".$prefix."all-in-one.$versionName.css";
+        }
+        else if( $type == "JS" )
+        {
+            $mime_type = "application/javascript" ;
+            $fileName = "web-assets/".$env."/minify/all-in-one.$versionName.js";
+        }
+
+        $file = $this->handleAssetUpload( $resultFile , $mime_type , $fileName );
+
+        return $file;
+    }
+
+    protected function getS3Path( $resultFile , $type )
+    {
+        $versionName = self::getVersionName() ;
+
+        $env = "" ;
+        if( YII_ENV == 'dev' )
+        {
+            $env = "dev" ;
+        }
+        else if( YII_ENV == 'qa'  )
+        {
+            $env = "qa" ;
+        }
+        else if( YII_ENV == 'prod'  )
+        {
+            $env = "prod" ;
+        }
+
+        $mime_type = null ;
+        $fileName =  null ;
+        if( $type == "CSS" )
+        {
+            $prefix = "" ;
+            $layout = \Yii::$app->controller->layout ;
+            if( in_array( $layout , ["old_main","public_pages"] ) )
+            {
+                $prefix = "public-pages-" ;
+            }
+
+            $mime_type = "text/css" ;
+            $fileName = "web-assets/".$env."/minify/".$prefix."all-in-one.$versionName.css";
+        }
+        else if( $type == "JS" )
+        {
+            $mime_type = "application/javascript" ;
+            $fileName = "web-assets/".$env."/minify/all-in-one.$versionName.js";
+        }
+
+        $file = $this->checkS3Path( $fileName , $resultFile , $mime_type );
+
+        return $file;
+    }
+
+    protected function handleAssetUpload($temp, $type, $fileName, $acl = "public-read", $storageClass = "STANDARD")
+    {
+        $aws = \Yii::$app->awssdk->getAwsSdk();
+        $s3 = $aws->createS3();
+        $bucket = $this->view->awsBucket;
+
+        try
+        {
+            $result = $s3->putObject(array(
+                'Bucket' => $bucket,
+                'Key' => $fileName,
+                'SourceFile' => $temp,
+                'ContentType' => $type,
+                'ACL' => $acl,
+                'StorageClass' => $storageClass
+            ));
+        }
+        catch (Exception $e)
+        {
+            throw new HttpException(431, 'Image upload failed to bucket.');
+        }
+
+        return $this->s3Path( $bucket , $fileName );
+    }
+
+    protected function getVersionName()
+    {
+        $sql = 'SELECT current_version FROM `application_version`' ;
+        $version = \Yii::$app->db->createCommand( $sql )->queryScalar();
+        return $version;
+    }
+
+    protected function s3Path( $bucket , $fileName )
+    {
+        return "https://s3.amazonaws.com/".$bucket."/".$fileName;
+    }
+
+    protected function checkS3Path( $fileName , $resultFile , $type  )
+    {
+        $aws = \Yii::$app->awssdk->getAwsSdk();
+        $s3 = $aws->createS3();
+        $bucket = $this->view->awsBucket;
+
+        if( $s3->doesObjectExist( $bucket , $fileName ) )
+        {
+            return $this->s3Path( $bucket , $fileName );
+        }
+        else
+        {
+            return $this->handleAssetUpload( $resultFile , $type ,$fileName );
+        }
+    }
+
 }

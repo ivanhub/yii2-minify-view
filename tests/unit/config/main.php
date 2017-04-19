@@ -11,7 +11,7 @@ return [
     'basePath' => BASE_PATH,
     'components' => [
         'view' => [
-            'class' => 'rmrevin\yii\minify\View',
+            'class' => 'processfast\yii\minify\View',
             'minify_path' => BASE_PATH . '/runtime/minyfy',
             'base_path' => BASE_PATH . '/runtime',
             'web_path' => '/runtime',

@@ -2,14 +2,14 @@
 /**
  * DependAssetBundle.php
  * @author Revin Roman
- * @link https://rmrevin.ru
+ * @link https://processfast.ru
  */
 
-namespace rmrevin\yii\minify\tests\unit\data;
+namespace processfast\yii\minify\tests\unit\data;
 
 /**
  * Class DependAssetBundle
- * @package rmrevin\yii\minify\tests\unit\data
+ * @package processfast\yii\minify\tests\unit\data
  */
 class DependAssetBundle extends \yii\web\AssetBundle
 {
@@ -23,11 +23,11 @@ class DependAssetBundle extends \yii\web\AssetBundle
     ];
 
     public $jsOptions = [
-        'position' => \rmrevin\yii\minify\View::POS_HEAD,
+        'position' => \processfast\yii\minify\View::POS_HEAD,
     ];
 
     public $depends = [
-        'rmrevin\yii\minify\tests\unit\data\JQueryAssetBundle',
+        'processfast\yii\minify\tests\unit\data\JQueryAssetBundle',
     ];
 
     public function init()

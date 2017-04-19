@@ -2,10 +2,10 @@
 /**
  * View.php
  * @author Revin Roman
- * @link https://rmrevin.ru
+ * @link https://processfast.ru
  */
 
-namespace rmrevin\yii\minify;
+namespace processfast\yii\minify;
 
 use yii\base\Event;
 use yii\helpers\FileHelper;
@@ -14,7 +14,7 @@ use yii\web\Response;
 
 /**
  * Class View
- * @package rmrevin\yii\minify
+ * @package processfast\yii\minify
  */
 class View extends \yii\web\View
 {
@@ -189,7 +189,25 @@ class View extends \yii\web\View
     public $excludeFiles = [];
 
     /**
-     * @throws \rmrevin\yii\minify\Exception
+     * @var boolean
+     */
+    public $S3Upload = false ;
+
+
+    /**
+     * @var boolean
+     */
+    public $awsBucket = null ;
+
+    /**
+     * @var boolean
+     * It is for linking Resource folder to asset files
+     * if Resources like images above one folder it should be "../" if two folders above "../../"
+     */
+    public $assetsFolderPathPatch = null ;
+
+    /**
+     * @throws \processfast\yii\minify\Exception
      */
     public function init()
     {

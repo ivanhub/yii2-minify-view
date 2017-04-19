@@ -2,14 +2,14 @@
 /**
  * ExcludedAssetBundle.php
  * @author Revin Roman
- * @link https://rmrevin.com
+ * @link https://processfast.com
  */
 
-namespace rmrevin\yii\minify\tests\unit\data;
+namespace processfast\yii\minify\tests\unit\data;
 
 /**
  * Class ExcludedAssetBundle
- * @package rmrevin\yii\minify\tests\unit\data
+ * @package processfast\yii\minify\tests\unit\data
  */
 class ExcludedAssetBundle extends \yii\web\AssetBundle
 {
