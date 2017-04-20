@@ -12,6 +12,16 @@ use yii\helpers\FileHelper;
 use yii\web\AssetBundle;
 use yii\web\Response;
 
+
+if( defined('RUNNING_FROM_CONSOLE') )
+{
+    $url = "/dev/ops-insights/" ;
+    \Yii::setAlias('@webroot', \Yii::$app->basePath."/../.." );
+    \Yii::setAlias('@web', $url );
+}
+
+
+
 /**
  * Class View
  * @package processfast\yii\minify
