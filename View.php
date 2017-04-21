@@ -13,14 +13,6 @@ use yii\web\AssetBundle;
 use yii\web\Response;
 
 
-if( defined('RUNNING_FROM_CONSOLE') )
-{
-    $url = "/dev/ops-insights/" ;
-    \Yii::setAlias('@webroot', \Yii::$app->basePath."/../.." );
-    \Yii::setAlias('@web', $url );
-}
-
-
 
 /**
  * Class View
@@ -216,6 +208,23 @@ class View extends \yii\web\View
      */
     public $assetsFolderPathPatch = null ;
 
+
+    /*
+     * boolean
+     * backend checke will help take asset from root/minify folder for backedn instead of root/backend/minifiy
+     */
+    public $backendCheck = false ;
+    /*
+     * Folder name where minified files will be kept
+     */
+    public $folderName = 'minify' ;
+    /*
+     * will be used at _getSummaryFilesHash will fix path to have same hash value as frontend or backend when files generated from console.
+     */
+    public $modifyPath = false  ;
+    public $modifyPathData = "" ;
+
+
     /**
      * @throws \processfast\yii\minify\Exception
      */
@@ -232,6 +241,19 @@ class View extends \yii\web\View
         $this->cssLinebreakPos = empty($this->cssLinebreakPos) ? $this->css_linebreak_pos : $this->cssLinebreakPos;
         $this->fileMode = empty($this->fileMode) ? $this->file_mode : $this->fileMode;
         $this->compressOptions = empty($this->compressOptions) ? $this->compress_options : $this->compressOptions;
+
+        if( $this->backendCheck )
+        {
+            $appId = \Yii::$app->id ;
+            if( $appId == "app-frontend" )
+            {
+                $this->minifyPath = $this->minifyPath."/".$this->folderName;
+            }
+            else if( $appId == "app-backend" )
+            {
+                $this->minifyPath = $this->minifyPath."/../".$this->folderName;
+            }
+        }
 
         $excludeBundles = $this->excludeBundles;
         if (!empty($excludeBundles)) {

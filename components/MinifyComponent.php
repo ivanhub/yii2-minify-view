@@ -149,6 +149,16 @@ abstract class MinifyComponent
         foreach ($files as $file => $html) {
             $path = $this->getAbsoluteFilePath($file);
 
+
+            if( $this->view->modifyPath )
+            {
+                $modifyPathData = $this->view->modifyPathData ;
+                if( strpos( $path , $modifyPathData ) !== false )
+                {
+                    $path = str_replace( $modifyPathData , '' , $path );
+                }
+            }
+
             if ($this->thisFileNeedMinify($file, $html) && file_exists($path)) {
                 switch ($this->view->fileCheckAlgorithm) {
                     default:
