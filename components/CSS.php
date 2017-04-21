@@ -56,9 +56,16 @@ class CSS extends MinifyComponent
      */
     protected function process(array $files)
     {
-        $resultFile = $this->view->minifyPath . DIRECTORY_SEPARATOR . $this->_getSummaryFilesHash($files) . '.css';
+        $hash = $this->_getSummaryFilesHash($files) ;
+        $resultFile = $this->view->minifyPath . DIRECTORY_SEPARATOR . $hash . '.css';
 
-        if (!file_exists($resultFile)) {
+        if(  $this->view->S3Upload && $this->doesObjectExist( $resultFile , "CSS" , $hash ) )
+        {
+            // It exist on s3 just do not do any processing
+            $resultFile = $this->getS3Path( $resultFile , "CSS" , $hash );
+        }
+        else if (!file_exists($resultFile))
+        {
             $css = '';
 
             foreach ($files as $file => $html) {
@@ -124,7 +131,8 @@ class CSS extends MinifyComponent
             $imports = $this->collectImports($css);
             $fonts = $this->collectFonts($css);
 
-            file_put_contents($resultFile, $charsets . $imports . $fonts . $css);
+            $content = gzencode( $charsets . $imports . $fonts . $css ,  9);
+            file_put_contents($resultFile, $content );
 
             if (false !== $this->view->fileMode) {
                 @chmod($resultFile, $this->view->fileMode);
@@ -132,15 +140,16 @@ class CSS extends MinifyComponent
 
             if( $this->view->S3Upload )
             {
-                $resultFile = $this->uploadToS3( $resultFile , "CSS" );
+                $resultFile = $this->uploadToS3( $resultFile , "CSS" , $hash );
             }
-
         }
-        else if( $this->view->S3Upload )
+        else
         {
-            $resultFile = $this->getS3Path( $resultFile , "CSS" );
+            if( $this->view->S3Upload )
+            {
+                $resultFile = $this->uploadToS3( $resultFile , "CSS" , $hash );
+            }
         }
-
 
         $file = $this->prepareResultFile($resultFile);
 

@@ -71,9 +71,16 @@ class JS extends MinifyComponent
      */
     protected function process($position, $options, $files)
     {
-        $resultFile = sprintf('%s/%s.js', $this->view->minifyPath, $this->_getSummaryFilesHash($files));
+        $hash = $this->_getSummaryFilesHash($files) ;
+        $resultFile = sprintf('%s/%s.js', $this->view->minifyPath, $hash);
 
-        if (!file_exists($resultFile)) {
+        if(  $this->view->S3Upload && $this->doesObjectExist( $resultFile , "JS" , $hash ) )
+        {
+            // It exist on s3 so just get
+            $resultFile = $this->getS3Path( $resultFile , "JS" , $hash );
+        }
+        else if (!file_exists($resultFile))
+        {
             $js = '';
 
             foreach ($files as $file => $html) {
@@ -99,6 +106,7 @@ class JS extends MinifyComponent
                     ->min();
             }
 
+            $js = gzencode( $js , 9 );
             file_put_contents($resultFile, $js);
 
             if (false !== $this->view->fileMode) {
@@ -107,12 +115,15 @@ class JS extends MinifyComponent
 
             if( $this->view->S3Upload )
             {
-                $resultFile = $this->uploadToS3( $resultFile , "JS" );
+                $resultFile = $this->uploadToS3( $resultFile , "JS" , $hash);
             }
         }
-        else if( $this->view->S3Upload )
+        else
         {
-            $resultFile = $this->getS3Path( $resultFile , "JS" );
+            if( $this->view->S3Upload )
+            {
+                $resultFile = $this->uploadToS3( $resultFile , "JS" , $hash);
+            }
         }
 
         $file = $this->prepareResultFile($resultFile);

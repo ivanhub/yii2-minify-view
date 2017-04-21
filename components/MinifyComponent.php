@@ -175,90 +175,20 @@ abstract class MinifyComponent
         return sha1($result);
     }
 
-    protected function uploadToS3( $resultFile , $type )
+    protected function uploadToS3( $resultFile , $type , $hash )
     {
-        $versionName = self::getVersionName() ;
-
-        $env = "" ;
-        if( YII_ENV == 'dev' )
-        {
-            $env = "dev" ;
-        }
-        else if( YII_ENV == 'qa'  )
-        {
-            $env = "qa" ;
-        }
-        else if( YII_ENV == 'prod'  )
-        {
-            $env = "prod" ;
-        }
-
-        $mime_type = null ;
-        $fileName =  null ;
-        if( $type == "CSS" )
-        {
-            $prefix = "" ;
-            $layout = \Yii::$app->controller->layout ;
-            if( in_array( $layout , ["old_main","public_pages"] ) )
-            {
-                $prefix = "public-pages-" ;
-            }
-
-            $mime_type = "text/css" ;
-            $fileName = "web-assets/".$env."/minify/".$prefix."all-in-one.$versionName.css";
-        }
-        else if( $type == "JS" )
-        {
-            $mime_type = "application/javascript" ;
-            $fileName = "web-assets/".$env."/minify/all-in-one.$versionName.js";
-        }
-
+        $fileName = $this->getFileInfo( $resultFile , $type , $hash , "FILENAME" );
+        $mime_type = $this->getFileInfo( $resultFile , $type , $hash , "MIMETYPE" );
         $file = $this->handleAssetUpload( $resultFile , $mime_type , $fileName );
-
         return $file;
     }
 
-    protected function getS3Path( $resultFile , $type )
+    protected function getS3Path( $resultFile , $type , $hash )
     {
-        $versionName = self::getVersionName() ;
-
-        $env = "" ;
-        if( YII_ENV == 'dev' )
-        {
-            $env = "dev" ;
-        }
-        else if( YII_ENV == 'qa'  )
-        {
-            $env = "qa" ;
-        }
-        else if( YII_ENV == 'prod'  )
-        {
-            $env = "prod" ;
-        }
-
-        $mime_type = null ;
-        $fileName =  null ;
-        if( $type == "CSS" )
-        {
-            $prefix = "" ;
-            $layout = \Yii::$app->controller->layout ;
-            if( in_array( $layout , ["old_main","public_pages"] ) )
-            {
-                $prefix = "public-pages-" ;
-            }
-
-            $mime_type = "text/css" ;
-            $fileName = "web-assets/".$env."/minify/".$prefix."all-in-one.$versionName.css";
-        }
-        else if( $type == "JS" )
-        {
-            $mime_type = "application/javascript" ;
-            $fileName = "web-assets/".$env."/minify/all-in-one.$versionName.js";
-        }
-
-        $file = $this->checkS3Path( $fileName , $resultFile , $mime_type );
-
-        return $file;
+        $fileName = $this->getFileInfo( $resultFile , $type , $hash , "FILENAME" );
+        $mime_type = $this->getFileInfo( $resultFile , $type , $hash , "MIMETYPE" );
+        $bucket = $this->view->awsBucket;
+        return $this->s3Path( $bucket , $fileName );
     }
 
     protected function handleAssetUpload($temp, $type, $fileName, $acl = "public-read", $storageClass = "STANDARD")
@@ -266,6 +196,7 @@ abstract class MinifyComponent
         $aws = \Yii::$app->awssdk->getAwsSdk();
         $s3 = $aws->createS3();
         $bucket = $this->view->awsBucket;
+        $contentEncoding = "gzip" ;
 
         try
         {
@@ -274,6 +205,7 @@ abstract class MinifyComponent
                 'Key' => $fileName,
                 'SourceFile' => $temp,
                 'ContentType' => $type,
+                'ContentEncoding'=>$contentEncoding,
                 'ACL' => $acl,
                 'StorageClass' => $storageClass
             ));
@@ -311,6 +243,66 @@ abstract class MinifyComponent
         else
         {
             return $this->handleAssetUpload( $resultFile , $type ,$fileName );
+        }
+    }
+
+    protected function doesObjectExist(  $resultFile , $type , $hash )
+    {
+        $fileName = $this->getFileInfo( $resultFile , $type , $hash , "FILENAME" );
+        $mime_type = $this->getFileInfo( $resultFile , $type , $hash , "MIMETYPE" );
+
+        $aws = \Yii::$app->awssdk->getAwsSdk();
+        $s3 = $aws->createS3();
+        $bucket = $this->view->awsBucket;
+
+        return $s3->doesObjectExist( $bucket , $fileName );
+    }
+
+    protected function getFileInfo(  $resultFile , $type , $hash  , $typeIn = "FILENAME" )
+    {
+        $versionName = self::getVersionName() ;
+
+        $env = "" ;
+        if( YII_ENV == 'dev' )
+        {
+            $env = "dev" ;
+        }
+        else if( YII_ENV == 'qa'  )
+        {
+            $env = "qa" ;
+        }
+        else if( YII_ENV == 'prod'  )
+        {
+            $env = "prod" ;
+        }
+
+        $mime_type = null ;
+        $fileName =  null ;
+        if( $type == "CSS" )
+        {
+            $prefix = "" ;
+            $layout = \Yii::$app->controller->layout ;
+            if( in_array( $layout , ["old_main","public_pages"] ) )
+            {
+                $prefix = "public-pages-" ;
+            }
+
+            $mime_type = "text/css" ;
+            $fileName = "web-assets/".$env."/minify/".$prefix."all-in-one".$versionName."-".$hash.".css";
+        }
+        else if( $type == "JS" )
+        {
+            $mime_type = "application/javascript" ;
+            $fileName = "web-assets/".$env."/minify/all-in-one".$versionName."-".$hash.".js";
+        }
+
+        if( $typeIn == "FILENAME" )
+        {
+            return $fileName;
+        }
+        else if( $typeIn == "MIMETYPE" )
+        {
+            return $mime_type;
         }
     }
 
