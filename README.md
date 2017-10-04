@@ -1,6 +1,8 @@
 Yii 2 Minify View Component
 ===========================
 
+Nor rmrevin nor processfast extensions didn't work on project YII2-environment, but this worked excellent.
+
 The main feature of this component - concatenate and compress files 
 connected through "AssetBundle". And added new functionality to upload them to AWS S3 bucket directly from minify folder on file generation. And it also adds functionality to generate assets and upload to S3 from console controller.But to have functionality of generating assests from console  [ Script runs it on deployment after composer install finishes. ] and uploading S3 you must have to follow rules of defining all the assets used in web application must be loaded everytime. You can differenttiate it with layouts but for every page in layout there should be same number of JS/CSS files. All the js/css files belongs to widgets must be also registered on page load instead of widget initialization. They must follow dependency structure in a way that all JS/CSS files generated follow same sequence in all the pages in same layout. Below in description i have added how i have given dependecies to my all asset bundles.
 
