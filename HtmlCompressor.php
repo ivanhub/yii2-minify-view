@@ -126,7 +126,9 @@ class HtmlCompressor
 
         // Remove HTML comments...
         if (array_key_exists('c', $options) || array_key_exists('no-comments', $options)) {
-            $out = preg_replace('/(<!--.*?-->)/ms', '', $out);
+//            $out = preg_replace('/(<!--.*?-->)/ms', '', $out);
+// adding browser's condition's exceptions
+	    $out = preg_replace('#\\s*<!--[^\\[].*?(?<!!)-->\\s*#s', '', $out);
             $out = str_replace('<!>', '', $out);
         }
 
